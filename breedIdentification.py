@@ -212,3 +212,42 @@ test_features = extact_features(test_data)
 #Free up some space.
 del test_data
 gc.collect()                            
+
+#Predict test labels given test data features.
+pred = model.predict(test_features)
+
+# First prediction
+print(pred[0])
+print(f"Max value (probability of prediction): {np.max(pred[0])}") # the max probability value predicted by the model
+print(f"Sum: {np.sum(pred[0])}") # because we used softmax activation in our model, this will be close to 1
+print(f"Max index: {np.argmax(pred[0])}") # the index of where the max value in predictions[0] occurs
+print(f"Predicted label: {classes[np.argmax(pred[0])]}")
+
+# Create pandas DataFrame with empty columns
+preds_df = pd.DataFrame(columns=["id"] + list(classes))
+preds_df.head()
+
+# Append test image ID's to predictions DataFrame
+test_path = "../input/dog-breed-identification/test/"
+preds_df["id"] = [os.path.splitext(path)[0] for path in os.listdir(test_path)]
+preds_df.head()
+
+preds_df.loc[:,list(classes)]= pred
+
+preds_df.to_csv('submission.csv',index=None)
+preds_df.head()
+
+#Custom input
+Image('../input/dogbreedidentification/The-English-Cocker-Spaniel-HP-long.jpg')
+
+#reading the image and converting it into an np array
+img_g = load_img('../input/dogbreedidentification/The-English-Cocker-Spaniel-HP-long.jpg',target_size = img_size)
+img_g = np.expand_dims(img_g, axis=0) # as we trained our model in (row, img_height, img_width, img_rgb) format, np.expand_dims convert the image into this format
+
+img_g.shape
+
+#Predict test labels given test data features.
+test_features = extact_features(img_g)
+predg = model.predict(test_features)
+print(f"Predicted label: {classes[np.argmax(predg[0])]}")
+print(f"Probability of prediction): {round(np.max(predg[0])) * 100} %")
